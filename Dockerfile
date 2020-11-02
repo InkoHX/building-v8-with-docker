@@ -1,4 +1,4 @@
-FROM ubuntu:20.10
+FROM debian:10 AS builder
 
 WORKDIR /workspaces
 
@@ -10,10 +10,19 @@ RUN apt-get update \
     wget \
     curl
 
-RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+RUN git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 ENV PATH=/workspaces/depot_tools:$PATH
 
-RUN fetch v8
+RUN fetch --no-history v8
 RUN cd v8 \
   && gclient sync \
   && tools/dev/gm.py x64.release
+
+
+FROM debian:10-slim
+
+WORKDIR /v8
+
+COPY --from=builder /workspaces/v8/out/x64.release .
+
+ENTRYPOINT [ "./d8" ]
