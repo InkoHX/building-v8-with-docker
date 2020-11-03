@@ -23,6 +23,7 @@ FROM debian:10-slim
 
 WORKDIR /v8
 
-COPY --from=builder /workspaces/v8/out/x64.release .
+COPY --from=builder /workspaces/v8/out/x64.release/d8 .
+COPY --from=builder /workspaces/v8/out/x64.release/snapshot_blob.bin .
 
 ENTRYPOINT [ "./d8" ]
